@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabla de Usuarios con Commit y Rollback</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 50%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        form {
+            margin-top: 20px;
+        }
+        input[type="text"] {
+            padding: 8px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 8px 16px;
+            font-size: 16px;
+        }
+        #commitButton {
+            display: none;
+            margin-top: 10px;
+        }
+        #status {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Users Table</h1>
+
+    <table id="userTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>Angel</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Pedro</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Mango</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <form id="addUserForm">
+        <input type="text" id="userId" placeholder="ID del usuario" required>
+        <input type="text" id="userName" placeholder="Nombre del usuario" required>
+        <button type="submit">Add User</button>
+    </form>
+
+    <button id="commitButton">Confirm</button>
+
+    <div id="status"></div>
+
+    <script>
+        const userTable = document.getElementById("userTable").getElementsByTagName('tbody')[0];
+        const form = document.getElementById("addUserForm");
+        const userIdInput = document.getElementById("userId");
+        const userNameInput = document.getElementById("userName");
+        const commitButton = document.getElementById("commitButton");
+        const statusDiv = document.getElementById("status");
+
+        let rollbackTimeout; // Variable para el timeout del rollback
+        let pendingUser = null; // Almacena el usuario que está pendiente de confirmación
+
+        form.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const userId = userIdInput.value;
+            const userName = userNameInput.value;
+
+            if (userId && userName) {
+                // Mostrar botón de confirmación
+                commitButton.style.display = "inline-block";
+                updateStatus("Waiting for confirmation", false);
+
+                // Guardar el usuario pendiente de ser agregado
+                pendingUser = { id: userId, name: userName };
+
+                // Iniciar temporizador de rollback (5 segundos)
+                rollbackTimeout = setTimeout(() => {
+                    rollback();
+                }, 5000);
+            }
+        });
+
+        commitButton.addEventListener("click", function() {
+            // Confirmar y agregar usuario si se presiona el botón dentro de los 5 segundos
+            commit();
+        });
+
+        function commit() {
+            if (pendingUser) {
+                // Crear una nueva fila en la tabla
+                const newRow = userTable.insertRow();
+
+                // Crear las celdas
+                const cellId = newRow.insertCell(0);
+                const cellUser = newRow.insertCell(1);
+
+                // Asignar los valores a las celdas
+                cellId.textContent = pendingUser.id;
+                cellUser.textContent = pendingUser.name;
+
+                updateStatus(`User added succesfully': ${pendingUser.name}`, true);
+
+                // Limpiar campos y ocultar el botón de confirmación
+                userIdInput.value = '';
+                userNameInput.value = '';
+                commitButton.style.display = "none";
+
+                // Limpiar el usuario pendiente y el timeout
+                pendingUser = null;
+                clearTimeout(rollbackTimeout);
+            }
+        }
+
+        function rollback() {
+            if (pendingUser) {
+                updateStatus("Transaction Timeout", false);
+                
+                // Limpiar campos y ocultar el botón de confirmación
+                userIdInput.value = '';
+                userNameInput.value = '';
+                commitButton.style.display = "none";
+
+                // Limpiar el usuario pendiente y el timeout
+                pendingUser = null;
+            }
+        }
+
+        function updateStatus(message, success = true) {
+            statusDiv.textContent = message;
+            statusDiv.style.color = success ? "green" : "red";
+        }
+    </script>
+
+</body>
+</html>

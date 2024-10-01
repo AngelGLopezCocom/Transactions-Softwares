@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulación de Retiro Bancario</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .hidden {
+            display: none;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        #status {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Bank</h1>
+
+    <div>
+        <label for="amount">Amount to Retire:</label>
+        <input type="number" id="amount" placeholder="Ingresa el monto">
+    </div>
+    <button id="withdrawButton">Retire</button>
+
+    <div id="status"></div>
+
+    <script>
+        let balance = 1000; // Saldo inicial
+        const withdrawalButton = document.getElementById("withdrawButton");
+        const statusDiv = document.getElementById("status");
+
+        function updateStatus(message, success = true) {
+            statusDiv.textContent = message;
+            statusDiv.style.color = success ? "green" : "red";
+        }
+
+        function rollback(amount) {
+            // Simular el rollback, devolviendo el monto al saldo
+            balance += amount;
+            updateStatus("Transacción fallida. Se ha realizado un rollback.", false);
+        }
+
+        function commit(amount) {
+            // Simular el commit, confirmando el retiro
+            updateStatus(`Retiro exitoso de $${amount}. Saldo restante: $${balance}`);
+        }
+
+        withdrawalButton.addEventListener("click", () => {
+            const amount = parseFloat(document.getElementById("amount").value);
+
+            if (isNaN(amount) || amount <= 0) {
+                updateStatus("Por favor, ingresa un monto válido.", false);
+                return;
+            }
+
+            if (amount > balance) {
+                updateStatus("Fondos insuficientes.", false);
+                return;
+            }
+
+            // Simula el inicio del proceso de retiro
+            updateStatus("Procesando el retiro...");
+
+            // Retira el monto (simulado) inmediatamente, pero podría ser revertido
+            balance -= amount;
+
+            let transactionConfirmed = false;
+
+            // Función para confirmar el commit manualmente antes del tiempo límite
+            function confirmTransaction() {
+                transactionConfirmed = true;
+                commit(amount);
+            }
+
+            // Establece un tiempo de espera de 5 segundos para confirmar la transacción
+            setTimeout(() => {
+                if (!transactionConfirmed) {
+                    // Si la transacción no se confirma en 5 segundos, se realiza rollback
+                    rollback(amount);
+                }
+            }, 5000);
+
+            // Simula una confirmación automática dentro del tiempo de espera (puedes desactivar esto para pruebas)
+            setTimeout(confirmTransaction, Math.random() * 5000); // Puede confirmarse antes del timeout
+        });
+    </script>
+
+</body>
+</html>

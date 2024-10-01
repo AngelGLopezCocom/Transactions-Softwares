@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users Deletion Simulation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CBBEB;
+            color: white;
+        }
+        .delete-button, .cancel-button {
+            background-color: #bb2b21;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+        .delete-button:hover {
+            background-color: #d13d3d;
+        }
+        .cancel-button {
+            background-color: #2f7cbb;
+            display: none;
+            margin-left: 10px;
+            border-radius: 6px;
+        }
+        .cancel-button:hover {
+            background-color: #1e64aa;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Users Deletion Simulation</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody id="data-table">
+        <tr>
+            <td>1</td>
+            <td>PedroPe</td>
+            <td>
+                <button class="delete-button" onclick="initiateDeletion(this)">Delete</button>
+                <button class="cancel-button" onclick="cancelDeletion(this)">Cancel</button>
+            </td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Mango</td>
+            <td>
+                <button class="delete-button" onclick="initiateDeletion(this)">Delete</button>
+                <button class="cancel-button" onclick="cancelDeletion(this)">Cancel</button>
+            </td>
+        </tr>
+        <tr></tr>
+            <td>3</td>
+            <td>Oscar</td>
+            <td>
+                <button class="delete-button" onclick="initiateDeletion(this)">Delete</button>
+                <button class="cancel-button" onclick="cancelDeletion(this)">Cancel</button>
+            </td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>HeryBaby</td>
+            <td>
+                <button class="delete-button" onclick="initiateDeletion(this)">Delete</button>
+                <button class="cancel-button" onclick="cancelDeletion(this)">Cancel</button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<script>
+    let deletionTimeout;
+
+    function initiateDeletion(button) {
+        const row = button.parentNode.parentNode;
+        const cancelBtn = row.querySelector('.cancel-button');
+        const deleteBtn = row.querySelector('.delete-button');
+
+        deleteBtn.disabled = true;
+        cancelBtn.style.display = 'inline-block';
+
+        deletionTimeout = setTimeout(() => {
+            row.parentNode.removeChild(row);
+            alert('Usuario eliminado.');
+        }, 5000); // Espera de 10 segundos para eliminar
+    }
+
+    function cancelDeletion(button) {
+        clearTimeout(deletionTimeout);
+        const row = button.parentNode.parentNode;
+        const cancelBtn = row.querySelector('.cancel-button');
+        const deleteBtn = row.querySelector('.delete-button');
+
+        alert('Eliminación cancelada.');
+        cancelBtn.style.display = 'none';
+        deleteBtn.disabled = false;
+    }
+</script>
+
+</body>
+</html>
